@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/codingsluv/crowdfounding/helper"
 	"github.com/codingsluv/crowdfounding/user"
 	"github.com/gin-gonic/gin"
 )
@@ -27,5 +28,8 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, user)
+
+	response := helper.ApiResponse("User Registered Successfully", http.StatusOK, "success", user)
+
+	c.JSON(http.StatusOK, response)
 }

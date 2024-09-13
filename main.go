@@ -29,6 +29,7 @@ func main() {
 	api := router.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
+	api.POST("/check_email", userHandler.CheckEmail)
 
 	router.Run(":8080")
 

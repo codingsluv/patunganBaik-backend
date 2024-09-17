@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/codingsluv/crowdfounding/helper"
@@ -109,6 +110,42 @@ func (h *userHandler) CheckEmail(c *gin.Context) {
 
 func (h *userHandler) UploadAvatar(c *gin.Context) {
 	// * Input dari user
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		respon := helper.ApiResponse("Upload avatar failed", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, respon)
+		return
+	}
+
+	// ! Belum menggunakan JWT
+	userID := 3
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		respon := helper.ApiResponse("Upload avatar failed", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, respon)
+		return
+	}
+
+	_, err = h.userService.SaveAvatar(userID, path)
+	if err != nil {
+		data := gin.H{"is_uploaded": false}
+		respon := helper.ApiResponse("Upload avatar failed", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, respon)
+		return
+	}
+
+	data := gin.H{
+		"is_uploaded": true,
+		"avatar_url":  "/api/v1/images/" + file.Filename,
+	}
+	respon := helper.ApiResponse("Upload avatar successfully", http.StatusOK, "success", data)
+	c.JSON(http.StatusOK, respon)
+
 	// * Simpan gambarnya di dalam folder "./images"
 	// * Di service panggil repo
 	// * JWT (sementara hard code, seakan2 user yg login ID == 1)

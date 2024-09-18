@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/codingsluv/crowdfounding/auth"
 	"github.com/codingsluv/crowdfounding/helper"
 	"github.com/codingsluv/crowdfounding/user"
 	"github.com/gin-gonic/gin"
@@ -11,10 +12,11 @@ import (
 
 type userHandler struct {
 	userService user.Service
+	authService auth.Service
 }
 
-func NewUserHandler(userService user.Service) *userHandler {
-	return &userHandler{userService}
+func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -38,7 +40,14 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	formatter := user.UserFormat(newUser, "tolkontoltolkontolkontolkontol")
+	token, err := h.authService.GenerateToken(newUser.ID)
+	if err != nil {
+		response := helper.ApiResponse("Register account failed", http.StatusUnprocessableEntity, "error", nil)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	formatter := user.UserFormat(newUser, token)
 
 	response := helper.ApiResponse("User Registered Successfully", http.StatusOK, "success", formatter)
 
@@ -65,10 +74,17 @@ func (h *userHandler) Login(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, response)
 		return
 	}
-	formatter := user.UserFormat(loginUser, "tolkontoltolkontolkontolkontol")
+
+	token, err := h.authService.GenerateToken(loginUser.ID)
+	if err != nil {
+		response := helper.ApiResponse("Login failed", http.StatusUnprocessableEntity, "error", nil)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	formatter := user.UserFormat(loginUser, token)
 
 	response := helper.ApiResponse("Login Successfully", http.StatusOK, "success", formatter)
-
 	c.JSON(http.StatusOK, response)
 }
 

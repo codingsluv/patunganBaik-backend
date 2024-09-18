@@ -12,6 +12,10 @@ type jwtService struct {
 // ? belajar
 var SECRET_KEY = []byte("patunganBaik_s3cr3t")
 
+func NewService() *jwtService {
+	return &jwtService{}
+}
+
 func (s *jwtService) GenerateToken(userID int) (string, error) {
 	// Implement JWT token generation logic here
 	claim := jwt.MapClaims{}

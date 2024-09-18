@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/codingsluv/crowdfounding/auth"
 	"github.com/codingsluv/crowdfounding/handler"
 	"github.com/codingsluv/crowdfounding/user"
 	"github.com/gin-gonic/gin"
@@ -22,10 +23,10 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewSevice(userRepository)
-
 	userService.SaveAvatar(3, "images/3-avatar.png")
+	authService := auth.NewService()
 
-	userHandler := handler.NewUserHandler(userService)
+	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()
 	api := router.Group("/api/v1")

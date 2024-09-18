@@ -26,6 +26,16 @@ func main() {
 	userService.SaveAvatar(3, "images/3-avatar.png")
 	authService := auth.NewService()
 
+	// token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.wLnHYptiUiLVzKzKSg6d4aws9ZBNHrDL-COyP_JxXSA")
+	// if err != nil {
+	// 	fmt.Println("ERROR")
+	// }
+	// if token.Valid {
+	// 	fmt.Println("VALID TOKEN")
+	// } else {
+	// 	fmt.Println("INVALID TOKEN")
+	// }
+
 	userHandler := handler.NewUserHandler(userService, authService)
 
 	router := gin.Default()

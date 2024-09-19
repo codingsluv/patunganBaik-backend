@@ -2,10 +2,14 @@ package main
 
 import (
 	"log"
+	"net/http"
+	"strings"
 
 	"github.com/codingsluv/crowdfounding/auth"
 	"github.com/codingsluv/crowdfounding/handler"
+	"github.com/codingsluv/crowdfounding/helper"
 	"github.com/codingsluv/crowdfounding/user"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -43,8 +47,55 @@ func main() {
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)
 	api.POST("/check_email", userHandler.CheckEmail)
-	api.POST("/avatars", userHandler.UploadAvatar)
+	api.POST("/avatars", authMiddleware(authService, userService), userHandler.UploadAvatar)
 
 	router.Run(":8080")
+
+}
+
+func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("Authorization")
+		if !strings.Contains(authHeader, "Bearer") {
+			response := helper.ApiResponse("Unathorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		// ? Mendapatkan token dari header authorization
+		tokenString := ""
+		arrayToken := strings.Split(authHeader, " ")
+		if len(arrayToken) == 2 {
+			tokenString = arrayToken[1]
+		}
+
+		//? Melakukan validasi token
+		token, err := authService.ValidateToken(tokenString)
+		if err != nil {
+			response := helper.ApiResponse("Unathorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		claimToken, ok := token.Claims.(jwt.MapClaims)
+		if !ok || !token.Valid {
+			response := helper.ApiResponse("Unathorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		//? Mendapatkan id user berdasarkan token
+		userID := int(claimToken["user_id"].(float64))
+
+		user, err := userService.GetUserByID(userID)
+		if err != nil {
+			response := helper.ApiResponse("Unathorized", http.StatusUnauthorized, "error", nil)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response)
+			return
+		}
+
+		c.Set("currentUser", user)
+		c.Next()
+	}
 
 }

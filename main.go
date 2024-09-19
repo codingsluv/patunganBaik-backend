@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/codingsluv/crowdfounding/auth"
+	"github.com/codingsluv/crowdfounding/campaign"
 	"github.com/codingsluv/crowdfounding/handler"
 	"github.com/codingsluv/crowdfounding/helper"
 	"github.com/codingsluv/crowdfounding/user"
@@ -26,6 +28,19 @@ func main() {
 	}
 
 	userRepository := user.NewRepository(db)
+	campaignRepository := campaign.NewRepository(db)
+
+	// campaigns, _ := campaignRepository.FindAll()
+	campaigns, _ := campaignRepository.FindByUserID(21)
+	fmt.Println("DEBUGGG")
+	fmt.Println("DEBUGGG")
+	fmt.Println("DEBUGGG")
+	fmt.Println(len(campaigns))
+
+	for _, campaign := range campaigns {
+		fmt.Println(campaign.Name)
+	}
+
 	userService := user.NewSevice(userRepository)
 	userService.SaveAvatar(3, "images/3-avatar.png")
 	authService := auth.NewService()

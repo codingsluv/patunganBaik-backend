@@ -30,23 +30,13 @@ func main() {
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
 
-	// campaigns, _ := campaignRepository.FindAll()
-	campaigns, _ := campaignRepository.FindByUserID(21)
-	fmt.Println("DEBUGGG")
-	fmt.Println("DEBUGGG")
-	fmt.Println("DEBUGGG")
-	fmt.Println(len(campaigns))
-
-	for _, campaign := range campaigns {
-		fmt.Println(campaign.Name)
-		if len(campaign.CampaignImges) > 0 {
-			fmt.Println(campaign.CampaignImges[0].Filename)
-		}
-	}
-
 	userService := user.NewSevice(userRepository)
 	userService.SaveAvatar(3, "images/3-avatar.png")
 	authService := auth.NewService()
+
+	campaingService := campaign.NewService(campaignRepository)
+	campaign, _ := campaingService.FindCampaigns(20)
+	fmt.Println(len(campaign))
 
 	// token, err := authService.ValidateToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.wLnHYptiUiLVzKzKSg6d4aws9ZBNHrDL-COyP_JxXSA")
 	// if err != nil {

@@ -39,6 +39,9 @@ func main() {
 
 	for _, campaign := range campaigns {
 		fmt.Println(campaign.Name)
+		if len(campaign.CampaignImges) > 0 {
+			fmt.Println(campaign.CampaignImges[0].Filename)
+		}
 	}
 
 	userService := user.NewSevice(userRepository)

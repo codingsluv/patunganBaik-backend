@@ -38,6 +38,9 @@ func main() {
 	campaignHandler := handler.NewCampaignHandler(campaingService)
 
 	router := gin.Default()
+	router.Static("/images", "./images")
+
+	// * User Endpoints
 	api := router.Group("/api/v1")
 	api.POST("/users", userHandler.RegisterUser)
 	api.POST("/sessions", userHandler.Login)

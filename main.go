@@ -30,9 +30,8 @@ func main() {
 	campaignRepository := campaign.NewRepository(db)
 
 	userService := user.NewSevice(userRepository)
-	userService.SaveAvatar(3, "images/3-avatar.png")
-	authService := auth.NewService()
 	campaingService := campaign.NewService(campaignRepository)
+	authService := auth.NewService()
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaingService)

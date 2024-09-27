@@ -125,12 +125,12 @@ func (h *userHandler) CheckEmail(c *gin.Context) {
 }
 
 func (h *userHandler) UploadAvatar(c *gin.Context) {
-	// * Input dari user
 	file, err := c.FormFile("avatar")
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		respon := helper.ApiResponse("Upload avatar failed", http.StatusBadRequest, "error", data)
-		c.JSON(http.StatusBadRequest, respon)
+		response := helper.ApiResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
@@ -142,29 +142,23 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 	err = c.SaveUploadedFile(file, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		respon := helper.ApiResponse("Upload avatar failed", http.StatusBadRequest, "error", data)
-		c.JSON(http.StatusBadRequest, respon)
+		response := helper.ApiResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
 	_, err = h.userService.SaveAvatar(userID, path)
 	if err != nil {
 		data := gin.H{"is_uploaded": false}
-		respon := helper.ApiResponse("Upload avatar failed", http.StatusBadRequest, "error", data)
-		c.JSON(http.StatusBadRequest, respon)
+		response := helper.ApiResponse("Failed to upload avatar image", http.StatusBadRequest, "error", data)
+
+		c.JSON(http.StatusBadRequest, response)
 		return
 	}
 
-	data := gin.H{
-		"is_uploaded": true,
-		"avatar_url":  "/api/v1/images/" + file.Filename,
-	}
-	respon := helper.ApiResponse("Upload avatar successfully", http.StatusOK, "success", data)
-	c.JSON(http.StatusOK, respon)
+	data := gin.H{"is_uploaded": true}
+	response := helper.ApiResponse("Avatar successfuly uploaded", http.StatusOK, "success", data)
 
-	// * Simpan gambarnya di dalam folder "./images"
-	// * Di service panggil repo
-	// * JWT (sementara hard code, seakan2 user yg login ID == 1)
-	// * Repo manggil data user ID == 1
-	// * Repo update data user dan disimpan ke file lokasi
+	c.JSON(http.StatusOK, response)
 }

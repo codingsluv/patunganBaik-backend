@@ -1,5 +1,7 @@
 package campaign
 
+import "strings"
+
 type CampaignFormatter struct {
 	ID               int    `json:"id"`
 	UserID           int    `json:"users_id"`
@@ -39,4 +41,59 @@ func FormatCampaigns(campaigns []Campaign) []CampaignFormatter {
 	}
 
 	return campaignsFormatter
+}
+
+type CampaignDetailFormatter struct {
+	ID               int                   `json:"id"`
+	UserID           int                   `json:"users_id"`
+	Name             string                `json:"name"`
+	ShortDescription string                `json:"short_description"`
+	Description      string                `json:"description"`
+	ImageURL         string                `json:"image_url"`
+	GoalAmount       int                   `json:"goal_amount"`
+	CurrentAmount    int                   `json:"current_amount"`
+	Slug             string                `json:"slug"`
+	Perks            []string              `json:"perks"`
+	User             CampaignUserFormatter `json:"user"`
+}
+
+type CampaignUserFormatter struct {
+	Name     string `json:"name"`
+	ImageURL string `json:"image_url"`
+}
+
+func FormatCampaignDetail(campaign Campaign) CampaignDetailFormatter {
+	campaignDetailFormatter := CampaignDetailFormatter{}
+	campaignDetailFormatter.ID = campaign.ID
+	campaignDetailFormatter.UserID = campaign.UserID
+	campaignDetailFormatter.Name = campaign.Name
+	campaignDetailFormatter.ShortDescription = campaign.ShortDescription
+	campaignDetailFormatter.Description = campaign.Description
+	campaignDetailFormatter.GoalAmount = campaign.GoalAmmount
+	campaignDetailFormatter.CurrentAmount = campaign.CurrentAmmount
+	campaignDetailFormatter.Slug = campaign.Slug
+	campaignDetailFormatter.ImageURL = ""
+	// campaignDetailFormatter.Perks = []string{}
+
+	if len(campaign.CampaignImages) > 0 {
+		campaignDetailFormatter.ImageURL = campaign.CampaignImages[0].Filename
+	}
+
+	var perks []string
+
+	for _, perk := range strings.Split(campaign.Perks, ",") {
+		perks = append(perks, strings.TrimSpace(perk))
+	}
+
+	campaignDetailFormatter.Perks = perks
+
+	user := campaign.User
+
+	campaignUserFormatter := CampaignUserFormatter{}
+	campaignUserFormatter.Name = user.Name
+	campaignUserFormatter.ImageURL = user.AvatarFilename
+
+	campaignDetailFormatter.User = campaignUserFormatter
+
+	return campaignDetailFormatter
 }

@@ -19,7 +19,7 @@ import (
 func main() {
 	// import "gorm.io/driver/mysql"
 	// refer: https://gorm.io/docs/connecting_to_the_database.html#MySQL
-	dsn := "root:codingsluv@tcp(127.0.0.1:3306)/crowdfounding?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:codingsluv@tcp(127.0.0.1:3306)/crowdfunding?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {

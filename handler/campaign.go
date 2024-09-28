@@ -6,6 +6,7 @@ import (
 
 	"github.com/codingsluv/crowdfounding/campaign"
 	"github.com/codingsluv/crowdfounding/helper"
+	"github.com/codingsluv/crowdfounding/user"
 	"github.com/gin-gonic/gin"
 )
 
@@ -72,4 +73,31 @@ func (h *campaignHandler) GetCampaign(c *gin.Context) {
 	response := helper.ApiResponse("Campaign detail", http.StatusOK, "success", campaign.FormatCampaignDetail(campaignDetail))
 	c.JSON(http.StatusOK, response)
 
+}
+
+func (h *campaignHandler) CreateCampaign(c *gin.Context) {
+	var input campaign.CreateCampaignInput
+
+	err := c.ShouldBindJSON(&input)
+	if err != nil {
+		errors := helper.FormatValidationError(err)
+		errorMessage := gin.H{"errors": errors}
+
+		response := helper.ApiResponse("Create campaign failed", http.StatusUnprocessableEntity, "error", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	currentUser := c.MustGet("currentUser").(user.User)
+	input.User = currentUser
+
+	newCampaign, err := h.service.CreateCampaign(input)
+	if err != nil {
+		response := helper.ApiResponse("Create campaign failed", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := helper.ApiResponse("Successfully create campaign", http.StatusOK, "success", campaign.FormatCampaign(newCampaign))
+	c.JSON(http.StatusOK, response)
 }

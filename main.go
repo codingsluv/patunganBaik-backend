@@ -9,6 +9,7 @@ import (
 	"github.com/codingsluv/crowdfounding/campaign"
 	"github.com/codingsluv/crowdfounding/handler"
 	"github.com/codingsluv/crowdfounding/helper"
+	"github.com/codingsluv/crowdfounding/transaction"
 	"github.com/codingsluv/crowdfounding/user"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -28,13 +29,16 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	campaignRepository := campaign.NewRepository(db)
+	transactionRepository := transaction.NewRepository(db)
 
 	userService := user.NewSevice(userRepository)
 	campaingService := campaign.NewService(campaignRepository)
+	transactionService := transaction.NewService(transactionRepository)
 	authService := auth.NewService()
 
 	userHandler := handler.NewUserHandler(userService, authService)
 	campaignHandler := handler.NewCampaignHandler(campaingService)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()
 	router.Static("/images", "./images")
@@ -51,8 +55,10 @@ func main() {
 	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
 
-	router.Run(":8080")
+	// * Transaction Endpoints
+	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransaction)
 
+	router.Run(":8080")
 }
 
 func authMiddleware(authService auth.Service, userService user.Service) gin.HandlerFunc {

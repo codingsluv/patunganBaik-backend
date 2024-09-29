@@ -1,12 +1,17 @@
 package transaction
 
-import "time"
+import (
+	"time"
+
+	"github.com/codingsluv/crowdfounding/user"
+)
 
 type Transaction struct {
 	ID         int
 	CampaignID int
 	UserID     int
 	Amount     int
+	User       user.User
 	Status     string
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
